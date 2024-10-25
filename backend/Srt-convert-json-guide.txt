@@ -1,0 +1,46 @@
+SRT to JSON Conversion Guide
+===========================
+
+The srt-convert-json package converts SRT subtitle files to JSON format.
+
+Input Format (SRT):
+------------------
+1
+00:00:01,000 --> 00:00:04,000
+First subtitle text
+
+2
+00:00:05,000 --> 00:00:08,000
+Second subtitle text
+
+
+Output Format (JSON):
+-------------------
+[
+  {
+    "id": "1",
+    "startTime": "00:00:01,000",
+    "endTime": "00:00:04,000",
+    "text": "First subtitle text"
+  },
+  {
+    "id": "2",
+    "startTime": "00:00:05,000",
+    "endTime": "00:00:08,000",
+    "text": "Second subtitle text"
+  }
+]
+
+Usage in our API:
+---------------
+1. Send a POST request to /api/upload
+2. Include the SRT file in the form-data with key 'file'
+3. The API will return JSON with:
+   - message: Success status
+   - filename: Original file name
+   - subtitles: Converted JSON array
+
+Error Handling:
+-------------
+- If no file is uploaded: 400 Bad Request
+- If processing fails: 500 Internal Server Error with error details
