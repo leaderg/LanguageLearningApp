@@ -45,7 +45,7 @@ app.post('/api/upload', upload.single('file'), async (req, res) => {
         const fileContents = fs.readFileSync(req.file.path, 'utf-8');
         console.log("File contents:", fileContents.substring(0, 500) + '...'); // First 500 chars
         // Convert SRT to JSON using temporary files
-        const outputPath = req.file.path + '.json';
+        const outputPath = req.file.path;
         
         // Wrap the conversion in a Promise with timeout
         await new Promise((resolve, reject) => {
