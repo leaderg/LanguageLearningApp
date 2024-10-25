@@ -52,31 +52,18 @@ app.use(express.json());
 
 // Add a basic test endpoint
 app.get('/api/test', (req, res) => {
-    console.log('Test endpoint hit');
     res.json({ message: 'Server is running' });
 });
 
 // API endpoint for SRT file upload and conversion
 app.post('/api/upload', upload.single('file'), async (req, res) => {
-    console.log("Received Call");
-    console.log("Request file:", req.file);
-    
     if (!req.file) {
         return res.status(400).json({ error: 'No file uploaded' });
     }
 
     try {
-        console.log("Processing file:", req.file.path);
-        
-        // Log file contents
         const fileContents = fs.readFileSync(req.file.path, 'utf-8');
-        console.log("File contents:", fileContents.substring(0, 500) + '...'); // First 500 chars
-        // Parse the SRT content directly
         const subtitles = parseSRT(fileContents);
-        
-        // Log the JSON to console
-        console.log('Processed JSON output:');
-        console.log(JSON.stringify(subtitles, null, 2));
         
         // Clean up temporary files
         fs.unlinkSync(req.file.path);
@@ -87,8 +74,6 @@ app.post('/api/upload', upload.single('file'), async (req, res) => {
             subtitles: subtitles
         });
     } catch (error) {
-        console.error("Error processing file:", error);
-        
         // Clean up the uploaded file in case of error
         if (req.file && fs.existsSync(req.file.path)) {
             fs.unlinkSync(req.file.path);

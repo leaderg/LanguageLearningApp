@@ -18,7 +18,6 @@ async function uploadFile() {
     formData.append('file', file);
 
     try {
-        console.log('Sending request to server...');
         const response = await fetch('http://localhost:5000/api/upload', {
             method: 'POST',
             body: formData,
@@ -28,7 +27,6 @@ async function uploadFile() {
                 'Accept': 'application/json'
             }
         });
-        console.log('Received response:', response);
 
         const data = await response.json();
         
