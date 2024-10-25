@@ -29,7 +29,8 @@ async function uploadFile() {
         const data = await response.json();
         
         if (!response.ok) {
-            throw new Error(data.error || 'Failed to process file');
+            const errorMessage = data.error ? `${data.error}: ${data.details}` : 'Failed to process file';
+            throw new Error(errorMessage);
         }
 
         resultDiv.style.display = 'block';

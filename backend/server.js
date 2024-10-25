@@ -24,12 +24,15 @@ app.get('/api/test', (req, res) => {
 
 // API endpoint for SRT file upload and conversion
 app.post('/api/upload', upload.single('file'), async (req, res) => {
-    console.log("Received Call")
+    console.log("Received Call");
+    console.log("Request file:", req.file);
+    
     if (!req.file) {
         return res.status(400).json({ error: 'No file uploaded' });
     }
 
     try {
+        console.log("Processing file:", req.file.path);
         // Convert SRT to JSON using temporary files
         const outputPath = req.file.path + '.json';
         await convert.process(req.file.path, outputPath);
@@ -52,6 +55,8 @@ app.post('/api/upload', upload.single('file'), async (req, res) => {
             subtitles: subtitles
         });
     } catch (error) {
+        console.error("Error processing file:", error);
+        
         // Clean up the uploaded file in case of error
         if (req.file && fs.existsSync(req.file.path)) {
             fs.unlinkSync(req.file.path);
@@ -59,7 +64,8 @@ app.post('/api/upload', upload.single('file'), async (req, res) => {
         
         res.status(500).json({
             error: 'Failed to process SRT file',
-            details: error.message
+            details: error.message,
+            stack: error.stack
         });
     }
 });
