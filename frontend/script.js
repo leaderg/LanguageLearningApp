@@ -20,7 +20,10 @@ async function uploadFile() {
     try {
         const response = await fetch('http://localhost:5000/api/upload', {
             method: 'POST',
-            body: formData
+            body: formData,
+            headers: {
+                'Accept': 'application/json'
+            }
         });
 
         const data = await response.json();

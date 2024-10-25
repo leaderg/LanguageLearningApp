@@ -7,7 +7,11 @@ const convert = require('srt-convert-json');
 const app = express();
 const upload = multer({ dest: 'uploads/' });
 
-app.use(cors());
+app.use(cors({
+    origin: 'null',
+    methods: ['POST', 'GET', 'OPTIONS'],
+    allowedHeaders: ['Content-Type']
+}));
 app.use(express.json());
 
 // API endpoint for SRT file upload and conversion
