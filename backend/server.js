@@ -12,6 +12,7 @@ app.use(express.json());
 
 // API endpoint for SRT file upload and conversion
 app.post('/api/upload', upload.single('file'), async (req, res) => {
+    console.log("Received Call")
     if (!req.file) {
         return res.status(400).json({ error: 'No file uploaded' });
     }
