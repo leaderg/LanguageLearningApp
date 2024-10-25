@@ -12,14 +12,25 @@ if (!fs.existsSync(uploadDir)){
     fs.mkdirSync(uploadDir);
 }
 
-const upload = multer({ dest: uploadDir });
+const upload = multer({ 
+    dest: uploadDir,
+    limits: {
+        fileSize: 50 * 1024 * 1024, // 50MB limit
+        files: 1
+    }
+});
 
 // Add more detailed CORS configuration
 app.use(cors({
     origin: '*',
     methods: ['GET', 'POST', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Accept']
+    allowedHeaders: ['Content-Type', 'Accept'],
+    maxAge: 600
 }));
+
+// Increase payload limits
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
 app.use(express.json());
 

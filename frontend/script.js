@@ -22,7 +22,11 @@ async function uploadFile() {
         const response = await fetch('http://localhost:5000/api/upload', {
             method: 'POST',
             body: formData,
-            mode: 'cors'
+            mode: 'cors',
+            timeout: 60000, // 60 second timeout
+            headers: {
+                'Accept': 'application/json'
+            }
         });
         console.log('Received response:', response);
 
