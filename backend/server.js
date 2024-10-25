@@ -40,15 +40,36 @@ app.post('/api/upload', upload.single('file'), async (req, res) => {
 
     try {
         console.log("Processing file:", req.file.path);
+        
+        // Log file contents
+        const fileContents = fs.readFileSync(req.file.path, 'utf-8');
+        console.log("File contents:", fileContents.substring(0, 500) + '...'); // First 500 chars
         // Convert SRT to JSON using temporary files
         const outputPath = req.file.path + '.json';
         
-        // Wrap the conversion in a Promise
+        // Wrap the conversion in a Promise with timeout
         await new Promise((resolve, reject) => {
-            convert.process(req.file.path, outputPath, (err) => {
-                if (err) reject(err);
-                else resolve();
-            });
+            console.log('Starting conversion process...');
+            const timeout = setTimeout(() => {
+                reject(new Error('Conversion timed out after 30 seconds'));
+            }, 30000);
+
+            try {
+                convert.process(req.file.path, outputPath, (err) => {
+                    clearTimeout(timeout);
+                    if (err) {
+                        console.error('Conversion error:', err);
+                        reject(err);
+                    } else {
+                        console.log('Conversion completed successfully');
+                        resolve();
+                    }
+                });
+            } catch (err) {
+                clearTimeout(timeout);
+                console.error('Conversion threw error:', err);
+                reject(err);
+            }
         });
 
         // Read the converted JSON after conversion is complete
