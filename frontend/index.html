@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SRT to JSON Converter</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>SRT to JSON Converter</h1>
+        <div class="upload-section">
+            <input type="file" id="srtFile" accept=".srt">
+            <button onclick="uploadFile()">Convert</button>
+        </div>
+        <div id="result" class="result-section">
+            <pre id="jsonOutput"></pre>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
