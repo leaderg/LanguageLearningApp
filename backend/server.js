@@ -5,7 +5,14 @@ const fs = require('fs');
 const convert = require('srt-convert-json');
 
 const app = express();
-const upload = multer({ dest: 'uploads/' });
+
+// Ensure uploads directory exists
+const uploadDir = 'uploads';
+if (!fs.existsSync(uploadDir)){
+    fs.mkdirSync(uploadDir);
+}
+
+const upload = multer({ dest: uploadDir });
 
 // Add more detailed CORS configuration
 app.use(cors({
@@ -35,9 +42,16 @@ app.post('/api/upload', upload.single('file'), async (req, res) => {
         console.log("Processing file:", req.file.path);
         // Convert SRT to JSON using temporary files
         const outputPath = req.file.path + '.json';
-        await convert.process(req.file.path, outputPath);
         
-        // Read the converted JSON
+        // Wrap the conversion in a Promise
+        await new Promise((resolve, reject) => {
+            convert.process(req.file.path, outputPath, (err) => {
+                if (err) reject(err);
+                else resolve();
+            });
+        });
+
+        // Read the converted JSON after conversion is complete
         const jsonContent = fs.readFileSync(outputPath, 'utf-8');
         const subtitles = JSON.parse(jsonContent);
         
