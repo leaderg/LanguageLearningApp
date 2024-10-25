@@ -2,7 +2,7 @@ const express = require('express');
 const multer = require('multer');
 const cors = require('cors');
 const fs = require('fs');
-const srtToJson = require('srt-convert-json');
+const convert = require('srt-convert-json');
 
 const app = express();
 const upload = multer({ dest: 'uploads/' });
@@ -17,14 +17,17 @@ app.post('/api/upload', upload.single('file'), async (req, res) => {
     }
 
     try {
-        // Read the uploaded SRT file
-        const srtContent = fs.readFileSync(req.file.path, 'utf-8');
+        // Convert SRT to JSON using temporary files
+        const outputPath = req.file.path + '.json';
+        await convert.process(req.file.path, outputPath);
         
-        // Convert SRT to JSON
-        const subtitles = await srtToJson(srtContent);
+        // Read the converted JSON
+        const jsonContent = fs.readFileSync(outputPath, 'utf-8');
+        const subtitles = JSON.parse(jsonContent);
         
-        // Clean up the uploaded file
+        // Clean up temporary files
         fs.unlinkSync(req.file.path);
+        fs.unlinkSync(outputPath);
         
         res.json({
             message: 'File processed successfully',
