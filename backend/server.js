@@ -29,6 +29,10 @@ app.post('/api/upload', upload.single('file'), async (req, res) => {
         const jsonContent = fs.readFileSync(outputPath, 'utf-8');
         const subtitles = JSON.parse(jsonContent);
         
+        // Log the JSON to console
+        console.log('Processed JSON output:');
+        console.log(JSON.stringify(subtitles, null, 2));
+        
         // Clean up temporary files
         fs.unlinkSync(req.file.path);
         fs.unlinkSync(outputPath);
