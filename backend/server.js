@@ -2,9 +2,25 @@ const express = require('express');
 const multer = require('multer');
 const cors = require('cors');
 const fs = require('fs');
-const convert = require('srt-convert-json');
-
 const app = express();
+
+function parseSRT(content) {
+    const subtitles = [];
+    const blocks = content.trim().split('\n\n');
+    
+    for (const block of blocks) {
+        const lines = block.split('\n');
+        if (lines.length >= 3) {
+            // Skip the index number and timestamp, just get the text
+            const text = lines.slice(2).join(' ').trim();
+            subtitles.push({
+                text: text
+            });
+        }
+    }
+    
+    return subtitles;
+}
 
 // Ensure uploads directory exists
 const uploadDir = 'uploads';
@@ -55,37 +71,8 @@ app.post('/api/upload', upload.single('file'), async (req, res) => {
         // Log file contents
         const fileContents = fs.readFileSync(req.file.path, 'utf-8');
         console.log("File contents:", fileContents.substring(0, 500) + '...'); // First 500 chars
-        // Convert SRT to JSON using temporary files
-        const outputPath = req.file.path;
-        
-        // Wrap the conversion in a Promise with timeout
-        await new Promise((resolve, reject) => {
-            console.log('Starting conversion process...');
-            const timeout = setTimeout(() => {
-                reject(new Error('Conversion timed out after 30 seconds'));
-            }, 30000);
-
-            try {
-                convert.process(req.file.path, outputPath, (err) => {
-                    clearTimeout(timeout);
-                    if (err) {
-                        console.error('Conversion error:', err);
-                        reject(err);
-                    } else {
-                        console.log('Conversion completed successfully');
-                        resolve();
-                    }
-                });
-            } catch (err) {
-                clearTimeout(timeout);
-                console.error('Conversion threw error:', err);
-                reject(err);
-            }
-        });
-
-        // Read the converted JSON after conversion is complete
-        const jsonContent = fs.readFileSync(outputPath, 'utf-8');
-        const subtitles = JSON.parse(jsonContent);
+        // Parse the SRT content directly
+        const subtitles = parseSRT(fileContents);
         
         // Log the JSON to console
         console.log('Processed JSON output:');
@@ -93,7 +80,6 @@ app.post('/api/upload', upload.single('file'), async (req, res) => {
         
         // Clean up temporary files
         fs.unlinkSync(req.file.path);
-        fs.unlinkSync(outputPath);
         
         res.json({
             message: 'File processed successfully',
